@@ -1,16 +1,55 @@
 <div style="margin: 20px;">
   <h1>AW Info Beta</h1>
-  <h5 style="color:gray">Currently in Beta. Donations to axoto.wam</h5>
+  <h5 style="color:gray">Currently in Beta. Donations to "axoto.wam"</h5>
   <div>
     <div>
-      <mat-form-field style="margin-right:20px">
-        <mat-label>Wax Account</mat-label>
-        <input matInput type="text" [(ngModel)]="account" [ngModelOptions]="{standalone: true}" />
-      </mat-form-field>
-      <button mat-raised-button color="primary" (click)="find()">Find</button>
+      <div style="display: flex;">
+        <div>
+          <mat-form-field style="margin-right:20px">
+            <mat-label>Wax Account</mat-label>
+            <input matInput type="text" [(ngModel)]="account" [ngModelOptions]="{standalone: true}" />
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="find()">Find</button>
+        </div>
+      </div>
+      <div *ngIf="!!accountData">
+        <h2 style="margin-block-start:0px; margin-block-end:0px">Resources</h2>
+        <div style="display: flex;">
+          <div style="margin-right:10px;" [hidden]="!cpuPercent">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>CPU</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <mat-label style="align-self: flex-start;">Used: <strong>{{cpuUsed}} ms</strong> from
+                  <strong>{{cpuMax}}ms</strong> </mat-label>
+                <mat-progress-bar style="height: 20px; max-width: 400px;" mode="determinate" value="{{cpuPercent}}">
+                </mat-progress-bar>
+                <div style="position: absolute; padding: 10px; color: white;top:60px;"> {{cpuPercent}}% </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+          <div [hidden]="!ramPercent">
+            <mat-card>
+              <mat-card-header>
+                <mat-card-title>RAM</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <mat-label style="align-self: flex-start;">Used: <strong>{{ramUsed}} KB</strong> from <strong>{{ramMax}}
+                    KB</strong> </mat-label>
+                <mat-progress-bar color="accent" style="height: 20px; max-width: 400px;" mode="determinate"
+                  value="{{ramPercent}}">
+                </mat-progress-bar>
+                <div style="position: absolute; padding: 10px; color: white;top:60px;"> {{ramPercent}}% </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </div>
       <div *ngIf="tlms && tlms.length > 0">
         <h2>TLM</h2>
-        <p *ngIf="tlms && tlms.length > 0" style="margin-top: 0px;">Mined <strong>{{tlms.length+1}}</strong> time/s last <strong>24hs</strong>. <strong> TOTAL: {{ totalTlm
+        <p *ngIf="tlms && tlms.length > 0" style="margin-top: 0px;">Mined <strong>{{tlms.length+1}}</strong> time/s last
+          <strong>24hs</strong>. <strong> TOTAL: {{ totalTlm
         }} TLM </strong> Mined
         </p>
         <mat-chip-list aria-label="TLM">
@@ -23,7 +62,7 @@
         <p style="margin-top: 0px;">Total AW NFTs: <strong>{{items && items.length ? items.length : 0 }}</strong></p>
         <div style="display:flex;">
           <p style="margin-top: 0px;">New NFTs to Claim: <strong>{{ this.nftsToClaim }}</strong></p>
-          <a style="margin-left: 20px;" [hidden]="this.nftsToClaim == 0"
+          <a style="margin-left: 20px;" [hidden]="nftsToClaim == 0"
             href="https://wax.bloks.io/account/m.federation?loadContract=true&tab=Actions&account=m.federation&scope=m.federation&limit=100&action=claimnfts"
             target="_blank">Claim on Bloks.io</a>
         </div>
@@ -40,7 +79,7 @@
     color: #fff;" selected>Legendaries: {{ legendaries }}</mat-chip>
           </mat-chip-list>
         </div>
-        </div>
+      </div>
     </div>
 
     <div class="loading-shade" *ngIf="isLoadingResults">

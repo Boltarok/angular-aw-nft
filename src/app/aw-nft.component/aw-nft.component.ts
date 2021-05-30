@@ -40,9 +40,19 @@ export class AwNftComponent implements AfterViewInit {
   epics: number = 0;
   legendaries: number = 0;
   nftsToClaim: number = 0;
+  accountData: any;
 
   tlms: any[];
   totalTlm: any;
+
+  cpuPercent: string;
+  cpuUsed: string;
+  cpuFree: string;
+  cpuMax: string;
+
+  ramPercent: string;
+  ramUsed: string;
+  ramMax: string;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -85,6 +95,7 @@ export class AwNftComponent implements AfterViewInit {
       this.dataSource.sort = this.sort;
       this.countNft(this.items);
       this.checkClaimNft(this.account);
+      this.checkAccount(this.account);
       this.isLoadingResults = false;
     });
 
@@ -105,6 +116,27 @@ export class AwNftComponent implements AfterViewInit {
       } else {
         this.nftsToClaim = 0;
       }
+    });
+  }
+  checkAccount(account: string){
+    this.nftService.checkAccount(account).subscribe((res:any)=>{
+      this.accountData = res;
+
+      var max = res.cpu_limit.max / 1000;
+      var used = res.cpu_limit.used / 1000;
+      var available = res.cpu_limit.available / 1000;
+
+      var ramUsed = res.ram_usage / 1024;
+      var ramMax = res.ram_quota / 1024;
+      
+      this.ramUsed = ramUsed.toFixed(2);
+      this.ramMax = ramMax.toFixed(2);
+      this.ramPercent = ((ramUsed *100) / ramMax).toFixed(2);
+
+      this.cpuFree = available.toFixed(2);
+      this.cpuMax = max.toFixed(2);
+      this.cpuUsed = used.toFixed(2);
+      this.cpuPercent = ((used * 100) / max).toFixed(2);
     });
   }
 

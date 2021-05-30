@@ -36,4 +36,20 @@ export class NftService {
       httpOptions
     );
   }
+
+  checkAccount(account: string): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    const payload = {
+      account_name: account
+    };
+    return this.http.post<any>(
+      `${this.baseUrl}chain/get_account`,
+      payload,
+      httpOptions
+    );
+  }
 }
