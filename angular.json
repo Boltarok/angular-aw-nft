@@ -17,7 +17,7 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
-            "tsConfig": "src/tsconfig.app.json",
+            "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -26,7 +26,6 @@
               "src/styles.css"
             ],
             "scripts": [
-              "../node_modules/lodash/lodash.js"
             ],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -103,7 +102,7 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "src/tsconfig.app.json",
+              "tsconfig.app.json",
               "src/tsconfig.spec.json"
             ],
             "exclude": [
