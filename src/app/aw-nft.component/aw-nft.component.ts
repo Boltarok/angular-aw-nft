@@ -3,7 +3,7 @@ import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import { AwService } from '../../services/aw.service';
 import * as _ from 'lodash';
-import moment from 'moment';
+import * as moment from 'moment';
 import { NftService } from '../../services/nft.service';
 
 export class NftData {
