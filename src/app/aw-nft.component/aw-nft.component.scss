@@ -1,0 +1,51 @@
+h1 {
+  font-family: Lato;
+}
+table {
+  width: 100%;
+}
+th.mat-sort-header-sorted {
+  color: black;
+}
+td,
+th {
+  width: 10%;
+}
+.rarity {
+  padding-left: 10px;
+  color: white;
+}
+.abundant {
+  @extend .rarity;
+  background-color: gray;
+}
+
+.common {
+  @extend .rarity;
+  background-color: black;
+}
+.rare {
+  @extend .rarity;
+  background-color: blue;
+}
+.epic {
+  @extend .rarity;
+  background-color: purple;
+}
+.legendary {
+  @extend .rarity;
+  background-color: goldenrod;
+}
+
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
