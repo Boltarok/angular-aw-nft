@@ -23,7 +23,7 @@
         <p style="margin-top: 0px;">Total AW NFTs: <strong>{{items && items.length ? items.length : 0 }}</strong></p>
         <div style="display:flex;">
           <p style="margin-top: 0px;">New NFTs to Claim: <strong>{{ this.nftsToClaim }}</strong></p>
-          <a [hidden]="this.nftsToClaim == 0"
+          <a style="margin-left: 20px;" [hidden]="this.nftsToClaim == 0"
             href="https://wax.bloks.io/account/m.federation?loadContract=true&tab=Actions&account=m.federation&scope=m.federation&limit=100&action=claimnfts"
             target="_blank">Claim on Bloks.io</a>
         </div>
