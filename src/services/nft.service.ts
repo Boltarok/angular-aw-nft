@@ -37,6 +37,17 @@ export class NftService {
     );
   }
 
+  checkTemplate(templateId: string) : Observable<any> {
+    const url = `https://wax.api.atomicassets.io/atomicassets/v1/templates/alien.worlds/${templateId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    return this.http.get<any>(url, httpOptions);
+  }
+
   checkAccount(account: string): Observable<any> {
     const httpOptions = {
       headers: new HttpHeaders({

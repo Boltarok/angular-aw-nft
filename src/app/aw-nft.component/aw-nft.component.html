@@ -59,13 +59,16 @@
 
       <div *ngIf="items && items.length > 0">
         <h2>NFTs</h2>
-        <p style="margin-top: 0px;">Total AW NFTs: <strong>{{items && items.length ? items.length : 0 }}</strong></p>
+        <p style="margin-top: 0px;">New NFTs to Claim: <strong>{{ this.nftsToClaim }}</strong></p>
         <div style="display:flex;">
-          <p style="margin-top: 0px;">New NFTs to Claim: <strong>{{ this.nftsToClaim }}</strong></p>
-          <a style="margin-left: 20px;" [hidden]="nftsToClaim == 0"
+          <mat-chip-list style="margin-right: 20px;" aria-label="NFT">
+            <mat-chip *ngFor="let temp of templates" class="{{temp.rarity.toLowerCase()}}" selected>{{temp.name}}</mat-chip>
+          </mat-chip-list>
+          <a [hidden]="nftsToClaim == 0"
             href="https://wax.bloks.io/account/m.federation?loadContract=true&tab=Actions&account=m.federation&scope=m.federation&limit=100&action=claimnfts"
             target="_blank">Claim on Bloks.io</a>
         </div>
+        <p style="margin-top: 20px;">Total AW NFTs: <strong>{{items && items.length ? items.length : 0 }}</strong></p>
         <div style="margin-bottom: 20px;">
           <mat-chip-list aria-label="NFT">
             <mat-chip color="primary" style="background-color: gray;

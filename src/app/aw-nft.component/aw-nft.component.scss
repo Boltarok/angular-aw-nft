@@ -13,28 +13,28 @@ th {
 }
 .rarity {
   padding-left: 10px;
-  color: white;
+  color: white!important;
 }
 .abundant {
   @extend .rarity;
-  background-color: gray;
+  background-color: gray!important;
 }
 
 .common {
   @extend .rarity;
-  background-color: black;
+  background-color: black!important;
 }
 .rare {
   @extend .rarity;
-  background-color: blue;
+  background-color: blue!important;
 }
 .epic {
   @extend .rarity;
-  background-color: purple;
+  background-color: purple!important;
 }
 .legendary {
   @extend .rarity;
-  background-color: goldenrod;
+  background-color: goldenrod!important;
 }
 
 .loading-shade {

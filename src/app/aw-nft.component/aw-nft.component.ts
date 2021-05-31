@@ -22,6 +22,13 @@ export class NftData {
   rand2: string;
   rand3: string;
 }
+export class nftTemplate {
+  name: string;
+  type: string;
+  rarity: string;
+  collection: string;
+  schema: string;
+}
 
 @Component({
   selector: 'aw-nft',
@@ -32,6 +39,7 @@ export class AwNftComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'name', 'type','rarity', 'timestamp','action','luck', 'rand1','rand2','rand3'];
   dataSource: MatTableDataSource<NftData>;
   items: NftData[];
+  templates: nftTemplate[];
   account: string;
   isLoadingResults: boolean = false;
   abundants: number = 0;
@@ -59,6 +67,7 @@ export class AwNftComponent implements AfterViewInit {
 
   constructor(private awService: AwService, private nftService: NftService) {
     this.items = new Array<NftData>();
+    this.templates = new Array<nftTemplate>();
     this.dataSource = new MatTableDataSource(this.items);
   }
 
@@ -115,6 +124,15 @@ export class AwNftComponent implements AfterViewInit {
       var result=_.find(res.rows, row => row.miner == this.account);
       if(!!result){
         this.nftsToClaim = result.template_ids.length;
+        result.template_ids.forEach(elem => {
+          this.nftService.checkTemplate(elem).subscribe((res2) => {
+            var template = new nftTemplate();
+            template.name = res2.data.immutable_data.name;
+            template.type = this.getType(res2.data.schema.schema_name);
+            template.rarity = res2.data.immutable_data.rarity;
+            this.templates.push(template);
+          });
+        });
       } else {
         this.nftsToClaim = 0;
       }
