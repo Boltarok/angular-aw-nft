@@ -135,6 +135,7 @@ export class AwNftComponent implements AfterViewInit {
         });
       } else {
         this.nftsToClaim = 0;
+        this.templates = new Array<nftTemplate>();
       }
     });
   }
