@@ -43,6 +43,7 @@ export class AwNftComponent implements AfterViewInit {
   accountData: any;
 
   tlms: any[];
+  tlmCount: number;
   totalTlm: any;
 
   cpuPercent: string;
@@ -106,6 +107,7 @@ export class AwNftComponent implements AfterViewInit {
     this.awService.GetLastTLM(this.account, nowStr,nowAfterStr).subscribe((res: any) => {
       this.tlms = _.map(res.actions, x => x.act.data.amount);
       this.totalTlm = _.sum(this.tlms).toFixed(4);
+      this.tlmCount = res.total.value;
     });
   }
   checkClaimNft(account: string){
