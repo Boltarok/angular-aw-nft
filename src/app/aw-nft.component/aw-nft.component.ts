@@ -119,20 +119,24 @@ export class AwNftComponent implements AfterViewInit {
       this.tlmCount = res.total.value;
     });
   }
-  checkClaimNft(account: string){
-    this.nftService.checkNft(account).subscribe((res:any)=>{
-      var result=_.find(res.rows, row => row.miner == this.account);
-      if(!!result){
+  checkClaimNft(account: string) {
+    this.nftService.checkNft(account).subscribe((res: any) => {
+      var result = _.find(res.rows, row => row.miner == this.account);
+      if (!!result) {
         this.nftsToClaim = result.template_ids.length;
-        result.template_ids.forEach(elem => {
-          this.nftService.checkTemplate(elem).subscribe((res2) => {
-            var template = new nftTemplate();
-            template.name = res2.data.immutable_data.name;
-            template.type = this.getType(res2.data.schema.schema_name);
-            template.rarity = res2.data.immutable_data.rarity;
-            this.templates.push(template);
+        if (this.nftsToClaim == 0) {
+          this.templates = new Array<nftTemplate>();
+        } else {
+          result.template_ids.forEach(elem => {
+            this.nftService.checkTemplate(elem).subscribe((res2) => {
+              var template = new nftTemplate();
+              template.name = res2.data.immutable_data.name;
+              template.type = this.getType(res2.data.schema.schema_name);
+              template.rarity = res2.data.immutable_data.rarity;
+              this.templates.push(template);
+            });
           });
-        });
+        }
       } else {
         this.nftsToClaim = 0;
         this.templates = new Array<nftTemplate>();
