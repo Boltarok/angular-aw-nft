@@ -1,3 +1,23 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+// default theme:
+$primary: mat-palette($mat-indigo, 500);
+$secondary: mat-palette($mat-indigo, 400);
+$accent: mat-palette($mat-pink, 400);
+// $theme: mat-light-theme($primary, $accent);
+
+// @include angular-material-theme($theme);
+
+// // "dark" theme
+// $dark-p: mat-palette($mat-blue-grey, 500);
+// $dark-a: mat-palette($mat-blue-grey,900);
+// $dark-t: mat-dark-theme($dark-p, $dark-a);
+
+// .darkTheme {
+//   @include angular-material-theme($dark-t);
+// }
+
 h1 {
   font-family: Lato;
 }
@@ -9,7 +29,7 @@ th.mat-sort-header-sorted {
 }
 td,
 th {
-  width: 10%;
+  width: 25%;
 }
 .rarity {
   padding-left: 10px;
@@ -48,4 +68,36 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+mat-button-toggle-group {
+  box-shadow: none;
+}
+
+mat-button-toggle {
+    border: 1px white solid !important;
+    // margin-top: 5px !important;
+    // padding: 0 5px !important;
+    z-index: 3 !important;
+    background-color: mat-color($primary) !important;
+    color: white !important;
+}
+
+mat-button-toggle:hover {
+    border: 1px white solid !important;
+	  // box-shadow: 0 0 20px #000 !important;
+    background-color: mat-color($accent) !important;
+    border-radius: 5px !important;
+}
+
+.mat-button-toggle-checked {
+    border: 1px white solid !important;
+    border-radius: 5px !important;
+    background-color: mat-color($accent) !important;
+    color: white !important;
+}
+
+.mat-button-toggle-input {
+    background-color: none !important;
+    padding-left: 32px !important;
 }

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
+import { AwCacheService } from './aw-cache.service';
+import { catchError, shareReplay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +10,7 @@ import { Observable } from 'rxjs';
 export class NftService {
   baseUrl: string = 'https://wax.greymass.com/v1/';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cacheService: AwCacheService) {}
 
   checkNft(account: string): Observable<any> {
     const httpOptions = {
@@ -30,11 +32,29 @@ export class NftService {
       reverse: false,
       show_payer: false
     };
-    return this.http.post<any>(
-      `${this.baseUrl}chain/get_table_rows`,
+    var url = `${this.baseUrl}chain/get_table_rows`;
+
+    if (this.cacheService.getCacheItem(url+account)) {
+      console.log('Retrieved item from cache');
+      return this.cacheService.getCacheItem(url+account);
+    }
+
+    var observable = this.http.post<any>(
+      url,
       payload,
       httpOptions
+    ).pipe(
+      shareReplay(1),
+      catchError(err => {
+        this.cacheService.deleteCacheItem(url+account);
+        return EMPTY;
+      })
     );
+
+    console.log('Retrieved item from API');
+    
+    this.cacheService.setCacheItem(url+account, observable);
+    return observable;
   }
 
   checkTemplate(templateId: string) : Observable<any> {
@@ -45,7 +65,23 @@ export class NftService {
       })
     };
 
-    return this.http.get<any>(url, httpOptions);
+    if (this.cacheService.getCacheItem(url)) {
+      console.log('Retrieved item from cache');
+      return this.cacheService.getCacheItem(url);
+    }
+
+    var observable =  this.http.get<any>(url, httpOptions).pipe(
+      shareReplay(1),
+      catchError(err => {
+        this.cacheService.deleteCacheItem(url);
+        return EMPTY;
+      })
+    );
+
+    console.log('Retrieved item from API');
+    
+    this.cacheService.setCacheItem(url, observable);
+    return observable;
   }
 
   checkAccount(account: string): Observable<any> {
@@ -57,10 +93,28 @@ export class NftService {
     const payload = {
       account_name: account
     };
-    return this.http.post<any>(
-      `${this.baseUrl}chain/get_account`,
+    var url = `${this.baseUrl}chain/get_account`;
+
+    if (this.cacheService.getCacheItem(url+account)) {
+      console.log('Retrieved item from cache');
+      return this.cacheService.getCacheItem(url+account);
+    }
+
+    var observable = this.http.post<any>(
+      url,
       payload,
       httpOptions
+    ).pipe(
+      shareReplay(1),
+      catchError(err => {
+        this.cacheService.deleteCacheItem(url+account);
+        return EMPTY;
+      })
     );
+
+    console.log('Retrieved item from API');
+    
+    this.cacheService.setCacheItem(url+account, observable);
+    return observable;
   }
 }

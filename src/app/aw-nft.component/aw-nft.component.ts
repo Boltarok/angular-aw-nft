@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { AwService } from '../../services/aw.service';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -21,6 +21,9 @@ export class NftData {
   rand1: string;
   rand2: string;
   rand3: string;
+  actionOrdinal: number;
+  creatorActionOrdinal: number;
+  templateId: string;
 }
 export class nftTemplate {
   name: string;
@@ -30,13 +33,18 @@ export class nftTemplate {
   schema: string;
 }
 
+export class tlmModel {
+  amount: string;
+  dateTime: Date;
+}
+
 @Component({
   selector: 'aw-nft',
   templateUrl: './aw-nft.component.html',
   styleUrls: ['./aw-nft.component.scss']
 })
 export class AwNftComponent implements AfterViewInit {
-  displayedColumns: string[] = ['id', 'name', 'type','rarity', 'timestamp','action','luck', 'rand1','rand2','rand3'];
+  displayedColumns: string[] = ['name', 'type', 'rarity', 'timestamp'];
   dataSource: MatTableDataSource<NftData>;
   items: NftData[];
   templates: nftTemplate[];
@@ -50,9 +58,9 @@ export class AwNftComponent implements AfterViewInit {
   nftsToClaim: number = 0;
   accountData: any;
 
+  tlmList: tlmModel[];
+  filteredTlm: tlmModel[];
   tlms: any[];
-  tlmCount: number;
-  totalTlm: any;
 
   cpuPercent: string;
   cpuUsed: string;
@@ -62,6 +70,7 @@ export class AwNftComponent implements AfterViewInit {
   ramPercent: string;
   ramUsed: string;
   ramMax: string;
+  tlmhs: string;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -69,6 +78,12 @@ export class AwNftComponent implements AfterViewInit {
     this.items = new Array<NftData>();
     this.templates = new Array<nftTemplate>();
     this.dataSource = new MatTableDataSource(this.items);
+    this.tlmhs = '24';
+    this.tlmList = new Array<tlmModel>();
+    this.filteredTlm = new Array<tlmModel>();
+
+    this.account = 'hpdra.wam';
+    this.find();
   }
 
   ngAfterViewInit(): void {
@@ -78,45 +93,66 @@ export class AwNftComponent implements AfterViewInit {
   find() {
     this.isLoadingResults = true;
     var that = this;
-    this.awService.GetLogMint(this.account).subscribe((res: any) => {
-      this.items = _.map(res.actions, action => {
-        var item = new NftData(); 
-        item.name = _.find(action.act.data.immutable_template_data, q => q.key == 'name')?.value[1];
+    this.awService.GetLogMint(this.account).subscribe(
+      (res: any) => {
+        this.items = _.map(res.actions, action => {
+          var item = new NftData();
+          item.name = _.find(action.act.data.immutable_template_data, q => q.key == 'name')?.value[1];
 
-        item.rarity = _.find(action.act.data.immutable_template_data, q => q.key == 'rarity')?.value[1];
+          item.rarity = _.find(action.act.data.immutable_template_data, q => q.key == 'rarity')?.value[1];
 
-        item.timestamp = action.timestamp;
-        item.timestampLocale = new Date(action.timestamp).toLocaleString();
-        item.collection = action.act.data.collection_name;
-        item.schema = action.act.data.schema_name;
-        if(item.collection == 'alien.worlds') {
-          item.type = that.getType(item.schema);
-        }
-        item.id = action.act.data.asset_id;
-        item.img = _.find(action.act.data.immutable_template_data, q => q.key == 'img')?.value[1];
-        item.imgLink = `https://resizer.atomichub.io/images/v1/preview?ipfs=${item.img}&size=370`;
+          item.timestamp = action.timestamp;
+          item.timestampLocale = new Date(action.timestamp).toLocaleString();
+          item.collection = action.act.data.collection_name;
+          item.schema = action.act.data.schema_name;
+          if (item.collection == 'alien.worlds') {
+            item.type = that.getType(item.schema);
+          }
+          item.id = action.act.data.asset_id;
+          item.img = _.find(action.act.data.immutable_template_data, q => q.key == 'img')?.value[1];
+          item.imgLink = `https://resizer.atomichub.io/images/v1/preview?ipfs=${item.img}&size=370`;
 
-        return item;
-      });
-      this.items = _.filter(this.items, res => {
-        return res.collection == 'alien.worlds';
-      });
-      this.dataSource = new MatTableDataSource(this.items);
-      this.dataSource.sort = this.sort;
-      this.countNft(this.items);
-      this.checkClaimNft(this.account);
-      this.checkAccount(this.account);
-      this.isLoadingResults = false;
-    });
+          item.actionOrdinal = action.action_ordinal;
+          item.creatorActionOrdinal = action.creator_action_ordinal;
+          item.templateId = action.act.data.template_id;
+
+          return item;
+        });
+        this.items = _.filter(this.items, res => {
+          return res.collection == 'alien.worlds' && res.actionOrdinal == 3 && res.creatorActionOrdinal == 2;
+        });
+        this.dataSource = new MatTableDataSource(this.items);
+        this.dataSource.sort = this.sort;
+        this.countNft(this.items);
+        this.checkClaimNft(this.account);
+        this.checkAccount(this.account);
+        this.isLoadingResults = false;
+      }, (error) => {
+        console.log('error!!');
+        this.isLoadingResults = false;
+      }
+    );
 
     var nowDate = moment().utc();
     var nowStr = nowDate.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
     var nowAfter = nowDate.subtract(1, 'days');
     var nowAfterStr = nowAfter.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
-    this.awService.GetLastTLM(this.account, nowStr,nowAfterStr).subscribe((res: any) => {
+    this.awService.GetLastTLM(this.account, nowStr, nowAfterStr).subscribe((res: any) => {
       this.tlms = _.map(res.actions, x => x.act.data.amount);
-      this.totalTlm = _.sum(this.tlms).toFixed(4);
-      this.tlmCount = res.total.value;
+      this.tlmList = _.map(res.actions, x => {
+        var tlm = new tlmModel();
+        tlm.amount = x.act.data.amount;
+        tlm.dateTime = moment(x.timestamp, 'YYYY-MM-DDTHH:mm:ss.SSS').toDate();
+
+        return tlm;
+      });
+      this.filteredTlm = JSON.parse(JSON.stringify(this.tlmList));
+    });
+  }
+  filterTlm(hs: string) {
+    this.filteredTlm = _.filter(this.tlmList, x => {
+      var now = moment().utc().subtract(hs, 'hours');
+      return moment(x.dateTime).isSameOrAfter(now);
     });
   }
   checkClaimNft(account: string) {
@@ -140,8 +176,8 @@ export class AwNftComponent implements AfterViewInit {
       }
     });
   }
-  checkAccount(account: string){
-    this.nftService.checkAccount(account).subscribe((res:any)=>{
+  checkAccount(account: string) {
+    this.nftService.checkAccount(account).subscribe((res: any) => {
       this.accountData = res;
 
       var max = res.cpu_limit.max / 1000;
@@ -150,10 +186,10 @@ export class AwNftComponent implements AfterViewInit {
 
       var ramUsed = res.ram_usage / 1024;
       var ramMax = res.ram_quota / 1024;
-      
+
       this.ramUsed = ramUsed.toFixed(2);
       this.ramMax = ramMax.toFixed(2);
-      this.ramPercent = ((ramUsed *100) / ramMax).toFixed(2);
+      this.ramPercent = ((ramUsed * 100) / ramMax).toFixed(2);
 
       this.cpuFree = available.toFixed(2);
       this.cpuMax = max.toFixed(2);
@@ -167,37 +203,41 @@ export class AwNftComponent implements AfterViewInit {
     this.setRandValue(index);
   }
   countNft(items: NftData[]) {
-    this.abundants = _.filter(items, x => x.rarity=='Abundant').length;
-    this.commons = _.filter(items, x => x.rarity=='Common').length;
-    this.rares = _.filter(items, x => x.rarity=='Rare').length;
-    this.epics = _.filter(items, x => x.rarity=='Epic').length;
-    this.legendaries = _.filter(items, x => x.rarity=='Legendary').length;
-}
+    this.abundants = _.filter(items, x => x.rarity == 'Abundant').length;
+    this.commons = _.filter(items, x => x.rarity == 'Common').length;
+    this.rares = _.filter(items, x => x.rarity == 'Rare').length;
+    this.epics = _.filter(items, x => x.rarity == 'Epic').length;
+    this.legendaries = _.filter(items, x => x.rarity == 'Legendary').length;
+  }
+
+  get totalTlm() {
+    return _.sum(_.map(this.filteredTlm, x => x.amount)).toFixed(4);
+  }
 
   getType(schema: string): string {
     switch (schema) {
-        case 'faces.worlds':
-            return 'Avatar';
-    
-        case 'arms.worlds':
-            return 'Weapon';
-    
-        case 'tool.worlds':
-            return 'Tool';
-    
-        case 'crew.worlds':
-            return 'Minion';
-    
-        default:
-            return 'Unknown'
+      case 'faces.worlds':
+        return 'Avatar';
+
+      case 'arms.worlds':
+        return 'Weapon';
+
+      case 'tool.worlds':
+        return 'Tool';
+
+      case 'crew.worlds':
+        return 'Minion';
+
+      default:
+        return 'Unknown'
     }
-}
+  }
   setRandValue(index: number) {
     var element = this.items[index];
     var before = moment(element.timestamp, "YYYY-MM-DDTHH:mm:ss.SSS");
     before = before.subtract(0.5, 'seconds');
     var beforeFinal = before.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
-    
+
     var after = moment(element.timestamp, "YYYY-MM-DDTHH:mm:ss.SSS");
     after = after.subtract(1, 'seconds');
     var afterFinal = after.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
@@ -219,11 +259,11 @@ export class AwNftComponent implements AfterViewInit {
         element.rand3 = 'failed';
       }
     });
-    if(element.rand1 == 'failed') {
+    if (element.rand1 == 'failed') {
       before = moment(element.timestamp, "YYYY-MM-DDTHH:mm:ss.SSS");
       before = before.subtract(1, 'seconds');
       beforeFinal = before.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
-      
+
       after = moment(element.timestamp, "YYYY-MM-DDTHH:mm:ss.SSS");
       after = after.subtract(1.5, 'seconds');
       afterFinal = after.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
@@ -245,8 +285,8 @@ export class AwNftComponent implements AfterViewInit {
           element.rand3 = 'failed';
         }
         // this.isLoadingResults = false;
-    });
+      });
     }
-    
+
   }
 }
