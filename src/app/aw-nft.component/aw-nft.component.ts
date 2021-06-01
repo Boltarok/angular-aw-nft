@@ -82,8 +82,6 @@ export class AwNftComponent implements AfterViewInit {
     this.tlmList = new Array<tlmModel>();
     this.filteredTlm = new Array<tlmModel>();
 
-    this.account = 'hpdra.wam';
-    this.find();
   }
 
   ngAfterViewInit(): void {

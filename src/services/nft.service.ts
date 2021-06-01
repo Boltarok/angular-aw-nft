@@ -35,7 +35,7 @@ export class NftService {
     var url = `${this.baseUrl}chain/get_table_rows`;
 
     if (this.cacheService.getCacheItem(url+account)) {
-      console.log('Retrieved item from cache');
+      
       return this.cacheService.getCacheItem(url+account);
     }
 
@@ -51,7 +51,7 @@ export class NftService {
       })
     );
 
-    console.log('Retrieved item from API');
+    
     
     this.cacheService.setCacheItem(url+account, observable);
     return observable;
@@ -66,7 +66,7 @@ export class NftService {
     };
 
     if (this.cacheService.getCacheItem(url)) {
-      console.log('Retrieved item from cache');
+      
       return this.cacheService.getCacheItem(url);
     }
 
@@ -78,7 +78,7 @@ export class NftService {
       })
     );
 
-    console.log('Retrieved item from API');
+    
     
     this.cacheService.setCacheItem(url, observable);
     return observable;
@@ -96,7 +96,7 @@ export class NftService {
     var url = `${this.baseUrl}chain/get_account`;
 
     if (this.cacheService.getCacheItem(url+account)) {
-      console.log('Retrieved item from cache');
+      
       return this.cacheService.getCacheItem(url+account);
     }
 
@@ -112,7 +112,7 @@ export class NftService {
       })
     );
 
-    console.log('Retrieved item from API');
+    
     
     this.cacheService.setCacheItem(url+account, observable);
     return observable;

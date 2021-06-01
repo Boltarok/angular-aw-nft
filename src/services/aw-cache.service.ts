@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TimestampObservableCache } from 'src/util/timestamp-observable-cache.model';
+import { TimestampObservableCache } from '../util/timestamp-observable-cache.model';
 
 @Injectable({
     providedIn: 'root'

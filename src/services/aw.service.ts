@@ -15,7 +15,7 @@ export class AwService {
     var url = `history/get_actions?account=${account}&filter=*%3Alogmint&skip=0&limit=100&sort=desc`;
 
     if (this.cacheService.getCacheItem(url)) {
-      console.log('Retrieved item from cache');
+      
       return this.cacheService.getCacheItem(url);
     }
 
@@ -28,7 +28,7 @@ export class AwService {
         return throwError('error');
       })
     );
-    console.log('Retrieved item from API');
+    
     
     this.cacheService.setCacheItem(url, observable);
     return observable;
@@ -43,7 +43,7 @@ export class AwService {
     var url = `history/get_actions?account=${account}&filter=alien.worlds%3A*&skip=0&limit=100&sort=desc&transfer.to=${account}`;
 
     if (this.cacheService.getCacheItem(url)) {
-      console.log('Retrieved item from cache');
+      
       return this.cacheService.getCacheItem(url);
     }
 
@@ -57,7 +57,7 @@ export class AwService {
       })
     );
 
-    console.log('Retrieved item from API');
+    
     
     this.cacheService.setCacheItem(url, observable);
     return observable;
