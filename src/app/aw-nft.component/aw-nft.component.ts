@@ -161,7 +161,7 @@ export class AwNftComponent implements AfterViewInit {
         return tlm;
       })
       this.filteredTlm = JSON.parse(JSON.stringify(this.tlmList));;
-      this.filterTlm('24');
+      this.filterTlm(this.tlmhs);
     });
   }
 
