@@ -35,7 +35,7 @@ export class nftTemplate {
 
 export class tlmModel {
   amount: string;
-  dateTime: Date;
+  dateTime: string;
 }
 
 @Component({
@@ -60,7 +60,6 @@ export class AwNftComponent implements AfterViewInit {
 
   tlmList: tlmModel[];
   filteredTlm: tlmModel[];
-  tlms: any[];
 
   cpuPercent: string;
   cpuUsed: string;
@@ -126,33 +125,56 @@ export class AwNftComponent implements AfterViewInit {
         this.checkAccount(this.account);
         this.isLoadingResults = false;
       }, (error) => {
-        console.log('error!!');
         this.isLoadingResults = false;
       }
     );
-
+    // this.getLastTlm();
+    this.getActions();
+  }
+  getLastTlm() {
     var nowDate = moment().utc();
     var nowStr = nowDate.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
     var nowAfter = nowDate.subtract(1, 'days');
     var nowAfterStr = nowAfter.format("YYYY-MM-DDTHH[%3A]mm[%3A]ss.SSS[Z]");
     this.awService.GetLastTLM(this.account, nowStr, nowAfterStr).subscribe((res: any) => {
-      this.tlms = _.map(res.actions, x => x.act.data.amount);
       this.tlmList = _.map(res.actions, x => {
         var tlm = new tlmModel();
         tlm.amount = x.act.data.amount;
-        tlm.dateTime = moment(x.timestamp, 'YYYY-MM-DDTHH:mm:ss.SSS').toDate();
+        tlm.dateTime = x.timestamp;
 
         return tlm;
       });
       this.filteredTlm = JSON.parse(JSON.stringify(this.tlmList));
     });
   }
-  filterTlm(hs: string) {
-    this.filteredTlm = _.filter(this.tlmList, x => {
-      var now = moment().utc().subtract(hs, 'hours');
-      return moment(x.dateTime).isSameOrAfter(now);
+
+  getActions() {
+    this.awService.GetActions(this.account).subscribe((res:any) => {
+      var filtered = _.filter(res.actions, x => {
+        return x.action_trace.act?.data?.from == 'm.federation';
+      });
+      this.tlmList = _.map(filtered, x => {
+        var tlm = new tlmModel();
+        tlm.amount = x.action_trace.act.data.quantity.split(' ')[0];
+        tlm.dateTime = x.block_time;
+
+        return tlm;
+      })
+      this.filteredTlm = _.orderBy(JSON.parse(JSON.stringify(this.tlmList)), ['dateTime'],['desc']);
     });
   }
+
+  filterTlm(hs: string) {
+    var now = moment().utc().subtract(+hs, 'hours');
+
+    this.filteredTlm = _.filter(this.tlmList, x => {
+      var filt= moment(x.dateTime, 'YYYY-MM-DDTHH:mm:ss.SSS');
+
+      return filt.isSameOrAfter(now);
+    });
+  }
+
+
   checkClaimNft(account: string) {
     this.nftService.checkNft(account).subscribe((res: any) => {
       var result = _.find(res.rows, row => row.miner == this.account);
@@ -209,7 +231,7 @@ export class AwNftComponent implements AfterViewInit {
   }
 
   get totalTlm() {
-    return _.sum(_.map(this.filteredTlm, x => x.amount)).toFixed(4);
+    return _.sum(_.map(this.filteredTlm, x => +x.amount)).toFixed(4);
   }
 
   getType(schema: string): string {

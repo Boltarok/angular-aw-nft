@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RequestService } from '../services/request.service';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { AwCacheService } from './aw-cache.service';
@@ -9,7 +9,41 @@ import { catchError, shareReplay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AwService {
-  constructor(private requestService: RequestService, private cacheService: AwCacheService) {}
+  constructor(private requestService: RequestService, private cacheService: AwCacheService, private http: HttpClient) {}
+
+
+  GetActions(account: string): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    var url = 'https://wax.greymass.com/v1/history/get_actions';
+    var payload = {
+      "account_name": account,
+      "pos": -1,
+      "offset": -100
+    };
+    if (this.cacheService.getCacheItem(url+account)) {
+      
+      return this.cacheService.getCacheItem(url+account);
+    }
+
+    var observable =  this.http.post<any>(
+      url,
+      payload,
+      httpOptions
+    ).pipe(
+      shareReplay(1),
+      catchError(err => {
+        this.cacheService.deleteCacheItem(url+account);
+        return throwError('error');
+      })
+    );
+
+    this.cacheService.setCacheItem(url+account, observable);
+    return observable;
+  }
 
   GetLogMint(account: string): Observable<any> {
     var url = `history/get_actions?account=${account}&filter=*%3Alogmint&skip=0&limit=100&sort=desc`;

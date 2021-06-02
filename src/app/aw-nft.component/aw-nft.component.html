@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div *ngIf="tlms && tlms.length > 0">
+      <div *ngIf="tlmList && tlmList.length > 0">
         <h2>TLM</h2>
         <mat-button-toggle-group [(ngModel)]="tlmhs" on-change="filterTlm(tlmhs)" aria-label="Font Style">
           <mat-button-toggle color='primary' value="24">24hs</mat-button-toggle>
@@ -55,7 +55,7 @@
           <mat-button-toggle value="3">3hs</mat-button-toggle>
           <mat-button-toggle value="1">1hs</mat-button-toggle>
         </mat-button-toggle-group>
-        <p *ngIf="tlms && tlms.length > 0" style="margin-top: 0px;">Mined <strong>{{filteredTlm.length}}</strong> time/s last
+        <p *ngIf="tlmList && tlmList.length > 0" style="margin-top: 0px;">Mined <strong>{{filteredTlm.length}}</strong> time/s last
           <strong>{{tlmhs}}hs</strong>. <strong> TOTAL: {{ totalTlm
         }} TLM </strong> Mined
         </p>
