@@ -149,7 +149,7 @@ export class AwNftComponent implements AfterViewInit {
   }
 
   getActions() {
-    this.awService.GetActions(this.account).subscribe((res:any) => {
+    this.awService.GetActions(this.account).subscribe((res: any) => {
       var filtered = _.filter(res.actions, x => {
         return x.action_trace.act?.data?.from == 'm.federation';
       });
@@ -160,18 +160,17 @@ export class AwNftComponent implements AfterViewInit {
 
         return tlm;
       })
-      this.filteredTlm = _.orderBy(JSON.parse(JSON.stringify(this.tlmList)), ['dateTime'],['desc']);
+      this.filteredTlm = JSON.parse(JSON.stringify(this.tlmList));;
+      this.filterTlm('24');
     });
   }
 
   filterTlm(hs: string) {
     var now = moment().utc().subtract(+hs, 'hours');
-
-    this.filteredTlm = _.filter(this.tlmList, x => {
-      var filt= moment(x.dateTime, 'YYYY-MM-DDTHH:mm:ss.SSS');
-
+    this.filteredTlm = _.orderBy(_.filter(this.tlmList, x => {
+      var filt = moment.utc(x.dateTime, 'YYYY-MM-DDTHH:mm:ss.SSS');
       return filt.isSameOrAfter(now);
-    });
+    }), ['dateTime'], ['desc']);
   }
 
 
